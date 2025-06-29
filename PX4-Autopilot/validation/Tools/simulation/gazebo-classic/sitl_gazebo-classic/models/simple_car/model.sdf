@@ -1,0 +1,115 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="simple_car">
+    <static>false</static>
+
+    <link name="base_link">
+      <pose>0 0 0.15 0 0 0</pose>
+      <collision name="collision">
+        <geometry>
+          <box><size>1 1 0.1</size></box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box><size>1 1 0.1</size></box>
+        </geometry>
+        <material><ambient>0 0 1 1</ambient></material>
+      </visual>
+      <inertial>
+        <mass>5.0</mass>
+      </inertial>
+
+      <!-- Landing pad visual -->
+      <visual name="landing_pad">
+        <pose>0 0 0.055 0 0 0</pose>
+        <geometry>
+          <box><size>1 1 0.01</size></box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://simple_car/materials/scripts</uri>
+            <uri>model://simple_car/materials/textures</uri>
+            <name>LandingPad</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <link name="wheel_front">
+      <pose>0.4 0 0 0 0 0</pose>
+      <collision name="collision">
+        <geometry><sphere><radius>0.1</radius></sphere></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><sphere><radius>0.1</radius></sphere></geometry>
+      </visual>
+      <inertial><mass>0.1</mass></inertial>
+    </link>
+
+    <joint name="wheel_joint_front" type="ball">
+    	<parent>base_link</parent>
+      <child>wheel_front</child>
+      
+    </joint>
+
+    <!-- === REAR WHEELS === -->
+    <link name="wheel_back_left">
+      <pose>-0.4 0.4 0.0 1.57 0 0</pose>
+      <collision name="collision">
+        <geometry><cylinder><radius>0.1</radius><length>0.1</length></cylinder></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><cylinder><radius>0.1</radius><length>0.1</length></cylinder></geometry>
+
+      </visual>
+      <inertial><mass>0.1</mass></inertial>
+    </link>
+
+    <link name="wheel_back_right">
+      <pose>-0.4 -0.4 0.0 -1.57 0 0</pose>
+      <collision name="collision">
+        <geometry><cylinder><radius>0.1</radius><length>0.1</length></cylinder></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><cylinder><radius>0.1</radius><length>0.1</length></cylinder></geometry>
+      </visual>
+      <inertial><mass>0.1</mass></inertial>
+    </link>
+
+    <!-- Rear joints -->
+    <joint name="left_wheel_joint" type="revolute">
+    	<parent>base_link</parent>
+      <child>wheel_back_left</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper></limit>
+      </axis>
+    </joint>
+
+    <joint name="right_wheel_joint" type="revolute">
+    	<parent>base_link</parent>
+      <child>wheel_back_right</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1e16</lower><upper>1e16</upper></limit>
+      </axis>
+    </joint>
+
+    <!-- Plugin điều khiển ROS2 -->
+    <plugin name="diff_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <ros>
+        <namespace>/</namespace>
+        <remapping>cmd_vel:=/cmd_vel</remapping>
+      </ros>
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_diameter>0.2</wheel_diameter> 
+      <wheel_separation>0.8</wheel_separation>
+      <publish_odom>true</publish_odom>
+      <odom_topic>odom</odom_topic>
+      <robot_base_frame>base_link</robot_base_frame>
+    </plugin>
+  </model>
+</sdf>
+

@@ -1,0 +1,13 @@
+material LandingPad
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture fcf5abd5-beb5-417c-bb94-68da07951224.png
+            }
+        }
+    }
+}
